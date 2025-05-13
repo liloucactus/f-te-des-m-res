@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quel cadeau offrir à maman ?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff0f5;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #e91e63;
+    }
+
+    .question {
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #e91e63;
+      background: #fff;
+      color: #e91e63;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options button:hover {
+      background: #e91e63;
+      color: white;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 20px;
+      color: #4caf50;
+      margin-top: 20px;
+    }
+
+    .result img {
+      margin-top: 15px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .restart {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background: #e91e63;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Quel cadeau offrir à maman ?</h1>
+    <div id="quiz">
+      <div id="question" class="question"></div>
+      <div class="options" id="options"></div>
+    </div>
+    <div id="result" class="result"></div>
+    <button id="restart" class="restart" style="display:none;" onclick="restartQuiz()">Recommencer</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Quel est le style de votre mère ?",
+        options: ["Élégant et classique" , "Décontracté et naturel" , "Créatif et original" , "festive et curieuse"]
+      },
+      {
+        question: "Comment aime-t-elle passer son temps libre ?",
+        options: ["Lire, écrire ou écouter de la musique" , "Jardiner ou cuisiner" , "Regarder des films ou des séries" , "Se balader, voyager ou découvrir de nouveaux lieux"]
+      },
+      {
+        question: "Quel type de cadeau lui ferait le plus plaisir ?",
+        options: ["Quelque chose de sentimental ou personnalisé" , "Un objet utile" , "Une expérience à vivre (atelier, soin, sortie...)" , "Une belle surprise ou un objet déco"]
+      },
+      {
+        question: "Si tu devais choisir une catégorie de cadeau :",
+        options: ["Beauté & bien-être (soins, parfum, massage)" , "Maison & déco (bougie, plante, vaisselle)" , "Loisirs & passions (livre, accessoire de cuisine, DIY)" , "Expérience (restaurant, spectacle, atelier créatif)"]
+      }
+    ];
+
+    const suggestions = {
+      "Élégant et classique_Jardiner ou cuisiner_Une belle surprise ou un objet déco_Maison & déco (bougie, plante, vaisselle)": {
+        text: "Un roman de poche ou une belle bougie parfumée",
+        image: "image/assiette.png"
+      },
+      "Décontracté et naturel_Se balader, voyager ou découvrir de nouveaux lieux_Un objet utile_Loisirs & passions (livre, accessoire de cuisine, DIY)": {
+        text: "tendance de plage",
+        image:"image/plage1.jpg"
+      },
+      "Élégant et classique_Lire, écrire ou écouter de la musique_Un objet utile_Beauté & bien-être (soins, parfum, massage)": {
+        text: "un lisseur ou un seche cheveux babyliss",
+        image: "image/lisseur.png"
+      },
+      "Sportive_Jardinage_20€ - 50€": {
+        text: "Des outils de jardinage ou une plante rare",
+        image: "https://images.unsplash.com/photo-1594977011424-bf5b1a13f1a2?fit=crop&w=600&h=400"
+      },
+      "default": {
+        text: "Un bouquet de fleurs accompagné d'une jolie carte",
+        image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?fit=crop&w=600&h=400"
+      }
+    };
+
+    let currentQuestion = 0;
+    let answers = [];
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const restartBtn = document.getElementById("restart");
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => selectAnswer(option);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(option) {
+      answers.push(option);
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      const exactKey = answers.join("_");
+      const wildcardKey = `${answers[0]}_${answers[1]}_*`;
+
+      let suggestion = suggestions[exactKey] || suggestions[wildcardKey] || suggestions["default"];
+
+      questionEl.textContent = "";
+      optionsEl.innerHTML = "";
+      resultEl.innerHTML = `
+        🎁 <strong>Suggestion de cadeau :</strong><br/>
+        ${suggestion.text}
+        <br/>
+        <img src="${suggestion.image}" alt="Suggestion de cadeau">
+      `;
+      restartBtn.style.display = "block";
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      answers = [];
+      resultEl.textContent = "";
+      resultEl.innerHTML = "";
+      restartBtn.style.display = "none";
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
